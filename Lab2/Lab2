@@ -1,0 +1,102 @@
+1.1
+  db.books.aggregate([
+  {
+    $group: {
+      _id: "$categories",
+      categoryCount: { $sum: 1 }
+    }
+  }
+  ])
+
+
+1.2 
+  db.books.aggregate([
+  {
+    $match: {
+      status: { $eq: "PUBLISH" }
+    }
+  },
+  {
+    $sort: { pageCount: 1 } // 1 for ascending, -1 for descending
+  }
+])
+
+
+1.3
+db.books.aggregate([
+  {
+    $skip: 5  
+  },
+  {
+    $limit: 10
+  }
+  ,
+   {
+    $sort: { pageCount: 1 }
+  }
+])
+
+
+1.4
+    db.books.aggregate([
+  {
+    $project: {
+      title: 1,
+      status: 1,
+      titleAndStatus: {
+        $concat: ["$title", " - ", "$status"]
+      }
+    }
+  },
+  {
+    $addFields: {
+      newField: { $toUpper: "$title" }
+    }
+  }
+])
+
+
+1.5
+db.books.aggregate([
+  {
+    $project: {
+      publishedDate: 1,
+      formattedDate: {
+        $dateToString: {
+          format: "%Y-%m-%d",
+          date: "$publishedDate"
+        }
+      },
+      firstAuthor: {
+        $arrayElemAt: ["$authors", 0]
+      }
+    }
+  }
+])
+
+
+1.6
+  db.books.aggregate([
+  {
+    $project: {
+  firstCategory: {
+        $arrayElemAt: ["$categories", 0]
+      }
+    }
+  }
+])
+  
+
+1.7
+  db.books.aggregate([
+  {
+    $unwind: "$authors"
+  },
+  {
+    $group: {
+      _id: "$authors",
+      numOfBooksForEachAuthor: { $sum: 1 }
+    }
+  }
+])
+  
