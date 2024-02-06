@@ -99,4 +99,109 @@ db.books.aggregate([
     }
   }
 ])
+
+---------------------------------------------------------
+
+1
+db.books.aggregate([
+  {
+    $group: {
+      _id: "$authors",
+      bookCount: { $sum: 1 }
+    }
+  }
+])
+
+
+2
+db.books.aggregate([
+  {
+    $match: {
+      status: { $exists: true },
+      longDescription: { $exists: true, $ne: "" },
+      shortDescription: { $exists: true, $ne: "" } 
+    }
+    
+  },
+  {
+    $sort: { pageCount: 1 }
+  }
+])
+
+3
+db.books.aggregate([
+  {
+    $skip: 5  
+  },
+  {
+    $limit: 10
+  }
+  ,
+    {
+    $match: {
+      status: { $eq: "PUBLISH" }
+    }
+  }
+])
+
+
+4
+  db.books.aggregate([
+  {
+    $project: {
+      title: 1,
+      pageCount: 1,
+      titleAndPageCount: {
+        $concat: ["$title", " - ", { $toString: "$pageCount" }]
+      },
+      status: 1  
+    }
+  },
+  {
+    $addFields: {
+      newField: { $toLower: "$status" }
+    }
+  }
+])
+ 
+5
+  db.books.aggregate([
+  {
+    $project: {
+      title: 1,
+      pageCount: 1,
+      publishedDate: 1,
+      formattedDate: {
+        $dateToString: {
+          format: "%Y-%m-%d",
+          date: "$publishedDate"
+        }}}}
+      ])
+
+
+6
+db.books.aggregate([
+  {
+    $project: {
+
+      firstAuthor: {
+        $arrayElemAt: ["$authors", 0]
+      }
+    }
+  }
+])
+  
+7
+  db.books.aggregate([
+  {
+    $unwind: "$authors"
+  },
+  {
+    $group: {
+      _id: "$authors",
+      numOfBooks: { $sum: 1 }
+    }
+  }
+])
+
   
